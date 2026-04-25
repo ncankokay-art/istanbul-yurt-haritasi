@@ -12,180 +12,195 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        #map { height: 650px; width: 100%; border-radius: 1rem; z-index: 10; }
-        .leaflet-popup-content-wrapper { border-radius: 15px; padding: 0; overflow: hidden; }
-        .leaflet-popup-content { margin: 0; width: 300px !important; }
-        .popup-img { width: 100%; height: 160px; object-fit: cover; }
-        .popup-video { width: 100%; height: 160px; border: none; }
-        .custom-marker { filter: hue-rotate(140deg); } /* Harita pin rengini özelleştirme */
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        
+        #map { 
+            height: 700px; 
+            width: 100%; 
+            border-radius: 1.5rem; 
+            z-index: 1;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Popup Tasarım Özelleştirme */
+        .leaflet-popup-content-wrapper {
+            border-radius: 1rem;
+            padding: 0;
+            overflow: hidden;
+        }
+        .leaflet-popup-content {
+            margin: 0 !important;
+            width: 320px !important;
+        }
+        .popup-container img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            display: block;
+        }
+        .popup-container iframe {
+            width: 100%;
+            height: 180px;
+            border: none;
+        }
+        .popup-info {
+            padding: 1.25rem;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
 
     <!-- NAVBAR -->
-    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-100">
+    <nav class="fixed w-full z-[1000] bg-white/80 backdrop-blur-md border-b border-slate-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16 items-center">
-                <div class="flex items-center">
-                    <span class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                        İstanbul Yurt Rehberi
-                    </span>
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-2">
+                    <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                    </div>
+                    <span class="text-xl font-bold tracking-tight text-slate-800">İstanbul Yurt Rehberi</span>
                 </div>
-                <div>
-                    <a href="mailto:iletisim@example.com" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full font-semibold transition-all shadow-md hover:shadow-lg active:scale-95">
-                        Bize Öner
-                    </a>
-                </div>
+                <button class="bg-slate-900 hover:bg-indigo-600 text-white px-6 py-2.5 rounded-full font-semibold transition-all duration-300 shadow-md">
+                    Bize Öner
+                </button>
             </div>
         </div>
     </nav>
 
     <!-- HERO SECTION -->
-    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 bg-white overflow-hidden">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div class="text-center">
-                <h1 class="text-5xl md:text-6xl font-extrabold text-slate-900 tracking-tight mb-6">
-                    İstanbul'daki Öğrenci <br/>
-                    <span class="text-indigo-600">Yurtlarını Keşfet</span>
-                </h1>
-                <p class="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-10 leading-relaxed">
-                    Eğitim hayatınızda yeni bir sayfa açarken yanınızdayız. Sosyal imkanları geniş, 
-                    güvenilir ve size en uygun yurtları harita üzerinde inceleyerek kolayca bulun.
-                </p>
-                <a href="#map-section" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-indigo-600 rounded-full hover:bg-indigo-700 transition-all shadow-xl hover:shadow-indigo-200 transform hover:-translate-y-1">
-                    Haritaya Git
-                    <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
-                </a>
-            </div>
+    <section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-white">
+        <div class="absolute inset-0 z-0">
+            <div class="absolute top-0 left-1/4 w-96 h-96 bg-indigo-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse"></div>
+            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-blue-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-pulse delay-700"></div>
         </div>
-        <!-- Arka plan süslemesi -->
-        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full opacity-10 pointer-events-none">
-            <div class="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-            <div class="absolute top-40 right-10 w-72 h-72 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <h1 class="text-5xl md:text-7xl font-extrabold text-slate-900 tracking-tight mb-8">
+                İstanbul'daki Öğrenci <br/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">Yurtlarını Keşfet</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto mb-12 leading-relaxed">
+                Şehrin en iyi yurtlarını konuma göre filtreleyin, odaları inceleyin ve tanıtım videolarını izleyin. Hayalindeki öğrenci hayatı burada başlıyor.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#map-area" class="px-10 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-lg transition-all shadow-xl shadow-indigo-200 hover:-translate-y-1">
+                    Haritaya Git
+                </a>
+                <button class="px-10 py-4 bg-white border border-slate-200 text-slate-700 rounded-2xl font-bold text-lg hover:bg-slate-50 transition-all">
+                    Nasıl Çalışır?
+                </button>
+            </div>
         </div>
     </section>
 
-    <!-- MAP SECTION -->
-    <section id="map-section" class="py-20 bg-slate-50">
+    <!-- MAP AREA -->
+    <section id="map-area" class="py-20 bg-slate-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
                 <div>
-                    <h2 class="text-3xl font-bold text-slate-900">İnteraktif Yurt Haritası</h2>
-                    <p class="text-slate-500 mt-2">Yurtların konumlarını görmek için haritayı kullanın veya marker'lara tıklayın.</p>
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">İnteraktif Keşif Haritası</h2>
+                    <p class="text-slate-500">Yurtların tam konumlarını görmek için haritadaki işaretlere tıklayın.</p>
                 </div>
-                <div id="loader" class="hidden flex items-center text-indigo-600 font-medium bg-white px-4 py-2 rounded-lg shadow-sm border border-indigo-100">
-                    <svg class="animate-spin h-5 w-5 mr-3 border-b-2 border-indigo-600 rounded-full" viewBox="0 0 24 24"></svg>
-                    Adresler işleniyor...
+                <div class="bg-white px-6 py-3 rounded-2xl shadow-sm border border-slate-200 flex items-center gap-3">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span id="stat" class="text-sm font-semibold text-slate-700 font-mono italic">Yükleniyor...</span>
                 </div>
             </div>
 
-            <!-- Harita Kutusu -->
-            <div class="bg-white p-2 rounded-2xl shadow-2xl border border-slate-200">
-                <div id="map"></div>
-            </div>
+            <!-- Harita Konteynırı -->
+            <div id="map"></div>
         </div>
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-white border-t border-slate-200 py-10">
-        <div class="text-center text-slate-400 text-sm">
-            &copy; 2024 İstanbul Yurt Rehberi - Tüm Hakları Saklıdır.
+    <footer class="bg-white border-t border-slate-200 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+            <p class="text-slate-400 text-sm italic">© 2024 İstanbul Öğrenci Yurdu Rehberi. Tüm veriler anlık olarak güncellenmektedir.</p>
         </div>
     </footer>
 
     <!-- SCRIPTS -->
-    <!-- PapaParse -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
     <script>
-        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT7bSBiaIFEoxe_LQwxrE_M80F2SQjhTOFpJiTKe6h_NV_R7FZVM-aZJwuRwxqiTf8_8u2nIS1SMMcm/pub?output=csv';
-        
-        // Haritayı başlat (İstanbul odaklı)
-        const map = L.map('map').setView([41.0082, 28.9784], 11);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        // 1. Harita Kurulumu (İstanbul Odaklı)
+        const map = L.map('map', {
+            scrollWheelZoom: false // Sayfa kaydırmayı kolaylaştırmak için
+        }).setView([41.015, 28.979], 11);
+
+        // Harita Görünümü (CartoDB Positron - Daha modern ve temiz durur)
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // YouTube URL Dönüştürücü (Embed formatı için)
-        function getYoutubeEmbed(url) {
+        // 2. YouTube URL Dönüştürücü
+        function formatYouTubeLink(url) {
             if (!url) return null;
-            let id = '';
+            let videoId = '';
             if (url.includes('v=')) {
-                id = url.split('v=')[1].split('&')[0];
+                videoId = url.split('v=')[1].split('&')[0];
             } else if (url.includes('youtu.be/')) {
-                id = url.split('youtu.be/')[1];
+                videoId = url.split('youtu.be/')[1];
             }
-            return id ? `https://www.youtube.com/embed/${id}` : null;
+            return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
         }
 
-        // Adresi Koordinata Çevir (Nominatim API)
-        async function getCoords(address) {
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address + ', Istanbul')}`);
-                const data = await response.json();
-                if (data.length > 0) {
-                    return [data[0].lat, data[0].lon];
-                }
-            } catch (err) {
-                console.error("Geocoding Hatası:", err);
-            }
-            return null;
-        }
+        // 3. Veri Çekme (Anında Yükleme)
+        const csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT7bSBiaIFEoxe_LQwxrE_M80F2SQjhTOFpJiTKe6h_NV_R7FZVM-aZJwuRwxqiTf8_8u2nIS1SMMcm/pub?output=csv';
 
-        // Verileri Çek ve İşle
-        async function processData() {
-            const loader = document.getElementById('loader');
-            loader.classList.remove('hidden');
+        Papa.parse(csvUrl, {
+            download: true,
+            header: true,
+            complete: function(results) {
+                const data = results.data;
+                let count = 0;
 
-            Papa.parse(csvUrl, {
-                download: true,
-                header: true,
-                complete: async (results) => {
-                    const data = results.data;
-                    
-                    for (const item of data) {
-                        if (!item.Adres || !item.Yurt_Adi) continue;
+                data.forEach(yurt => {
+                    // Enlem ve Boylam kontrolü (Boş satırları atlar)
+                    if (yurt.Enlem && yurt.Boylam) {
+                        const lat = parseFloat(yurt.Enlem.replace(',', '.'));
+                        const lng = parseFloat(yurt.Boylam.replace(',', '.'));
+                        const videoEmbed = formatYouTubeLink(yurt.Video_URL);
 
-                        const coords = await getCoords(item.Adres);
-                        
-                        if (coords) {
-                            const videoUrl = getYoutubeEmbed(item.Video_URL);
-                            
-                            const popupHTML = `
-                                <div class="overflow-hidden">
-                                    ${item.Gorsel_URL ? `<img class="popup-img" src="${item.Gorsel_URL}" alt="${item.Yurt_Adi}">` : ''}
-                                    <div class="p-4">
-                                        <h3 class="font-bold text-lg text-slate-800 leading-tight">${item.Yurt_Adi}</h3>
-                                        <p class="text-sm text-slate-500 mt-2 leading-snug"><span class="font-semibold text-slate-700">Adres:</span> ${item.Adres}</p>
+                        // Popup İçeriği Oluşturma
+                        const popupContent = `
+                            <div class="popup-container">
+                                ${yurt.Gorsel_URL ? `<img src="${yurt.Gorsel_URL}" alt="${yurt.Yurt_Adi}">` : ''}
+                                <div class="popup-info">
+                                    <h3 class="font-bold text-lg text-slate-800 leading-tight mb-2">${yurt.Yurt_Adi}</h3>
+                                    <div class="flex items-start gap-2 mb-3">
+                                        <svg class="w-4 h-4 text-indigo-500 mt-1 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        <p class="text-sm text-slate-600">${yurt.Adres}</p>
                                     </div>
-                                    ${videoUrl ? `
-                                        <div class="border-t border-slate-100">
-                                            <iframe class="popup-video" src="${videoUrl}" allowfullscreen></iframe>
-                                        </div>
-                                    ` : ''}
                                 </div>
-                            `;
+                                ${videoEmbed ? `
+                                    <div class="video-wrapper">
+                                        <iframe src="${videoEmbed}" allowfullscreen></iframe>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
 
-                            L.marker(coords).addTo(map).bindPopup(popupHTML);
-                        }
-
-                        // API Rate limit'e takılmamak için kısa bekleme (Nominatim saniyede max 1 istek ister)
-                        await new Promise(resolve => setTimeout(resolve, 600));
+                        // Markeri Haritaya Ekle
+                        L.marker([lat, lng]).addTo(map).bindPopup(popupContent);
+                        count++;
                     }
-                    loader.classList.add('hidden');
-                }
-            });
-        }
+                });
+                
+                document.getElementById('stat').innerText = `${count} Yurt Listelendi`;
+            }
+        });
 
-        // Sayfa yüklendiğinde veri çekme işlemini başlat
-        window.addEventListener('load', processData);
+        // Harita scroll engelleme aktif/pasif
+        map.on('focus', () => { map.scrollWheelZoom.enable(); });
+        map.on('blur', () => { map.scrollWheelZoom.disable(); });
     </script>
-
 </body>
 </html>
